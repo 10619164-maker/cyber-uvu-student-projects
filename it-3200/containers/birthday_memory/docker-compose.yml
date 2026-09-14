@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: thebirthdates-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: thebirthdates
+      POSTGRES_USER: birthday
+      POSTGRES_PASSWORD: birthday
+    ports:
+      - "5544:5432"
+    volumes:
+      - thebirthdates-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U birthday -d thebirthdates"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  thebirthdates-data:
