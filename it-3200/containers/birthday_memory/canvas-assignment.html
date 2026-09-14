@@ -1,0 +1,240 @@
+<!--
+  IT 3200 — Canvas Assignment Page
+  ---------------------------------
+  This file is a ready-to-paste HTML FRAGMENT (no <html>/<head>/<body>).
+  In Canvas: open the Assignment/Page editor, click the "</>" (HTML Editor)
+  icon in the Rich Content Editor toolbar, delete any placeholder content,
+  and paste everything below the closing comment marker into that box.
+  Then switch back to the visual editor to confirm it renders, and Save.
+
+  Accessibility notes for whoever maintains this page:
+  - One <h1>, then <h2> per major section, <h3> for sub-steps. Don't skip levels.
+  - Every section is a <section aria-labelledby="..."> tied to its heading id.
+  - Color is never the only signal (icons/labels always pair with color).
+  - All text/background combinations below meet WCAG AA contrast (4.5:1+).
+  - External links open in a new tab AND say so for screen reader users.
+  - Commands are marked up with <code>/<pre> so they're announced correctly.
+  - The troubleshooting list uses native <details>/<summary> (keyboard + AT accessible,
+    no JavaScript required).
+    
+-->
+<div style="max-width:900px;margin:0 auto;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.65;color:#1a1a2e;">
+
+<header style="background:linear-gradient(135deg,#241b4e 0%,#5b21b6 55%,#9d174d 100%);color:#ffffff;padding:2rem 1.75rem;border-radius:14px;margin-bottom:1.75rem;box-shadow:0 4px 14px rgba(36,27,78,0.35);">
+  <p style="text-transform:uppercase;letter-spacing:0.12em;font-size:0.8rem;font-weight:700;color:#f5d0fe;margin:0 0 0.5rem 0;">IT 3200 &middot; Containers &amp; DevOps</p>
+  <h1 id="assignment-title" style="font-size:1.9rem;margin:0 0 0.6rem 0;color:#ffffff;">🎂 Birthday Memory: Build It, Run It, Containerize It</h1>
+  <p style="font-size:1.05rem;margin:0 0 1rem 0;color:#ede9fe;">A hands-on assignment where you stand up a full-stack app locally, then package the entire stack — frontend, backend, and database — with Docker Compose.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+    <span style="background:#ffffff;color:#4c1d95;font-weight:700;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:999px;">⏱ Est. time: 3–4 hours</span>
+    <span style="background:#ffffff;color:#9f1239;font-weight:700;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:999px;">📶 Difficulty: Intermediate</span>
+    <span style="background:#ffffff;color:#0f766e;font-weight:700;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:999px;">🧩 Individual assignment</span>
+  </div>
+</header>
+
+<section aria-labelledby="overview-heading" style="background:#eef2ff;border-left:6px solid #4338ca;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="overview-heading" style="color:#3730a3;margin-top:0;">📋 Overview</h2>
+  <p>You will work with <strong>Birthday Memory</strong>, a small full-stack app (React + Vite frontend, Node/Express backend, PostgreSQL database) that stores birthdays and shows them on a searchable calendar. The starter project already runs locally with <code>npm</code>, and already ships a Docker Compose file that containerizes <em>just the database</em>.</p>
+  <p>Your job has two parts:</p>
+  <ol style="padding-left:1.4rem;">
+    <li>Get the app running locally the normal way (Node + the bundled database container) so you understand what it does.</li>
+    <li>Extend the project so the <strong>entire application</strong> — frontend, backend, <em>and</em> database — starts with a single <code>docker compose up</code> command.</li>
+  </ol>
+  <p style="margin-bottom:0;">Read the project's own README before you start — it has the authoritative setup steps this assignment builds on:</p>
+  <p style="margin-bottom:0;">
+    <a href="https://github.com/hvaandres/cyber-uvu-student-projects/tree/main/it-3200/containers/birthday_memory" target="_blank" rel="noopener noreferrer" style="color:#3730a3;font-weight:700;">Birthday Memory project &amp; README on GitHub
+      <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;"> (opens in a new tab)</span>
+    </a>
+  </p>
+</section>
+
+<section aria-labelledby="objectives-heading" style="background:#ecfdf5;border-left:6px solid #047857;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="objectives-heading" style="color:#065f46;margin-top:0;">🎯 Learning Objectives</h2>
+  <p>By the end of this assignment, you will be able to:</p>
+  <ul style="padding-left:1.4rem;margin-bottom:0;">
+    <li>Install and verify a Node.js + PostgreSQL development toolchain on your own machine.</li>
+    <li>Run a multi-service application (client, API, database) locally and diagnose connection issues between them.</li>
+    <li>Write a <code>Dockerfile</code> for a Node.js backend and for a Vite-based frontend.</li>
+    <li>Extend a <code>docker-compose.yml</code> file to orchestrate multiple containers on a shared network.</li>
+    <li>Explain the difference between host-mapped ports and container-internal ports when services talk to each other inside Docker.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="prereq-heading" style="background:#fffbeb;border-left:6px solid #b45309;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="prereq-heading" style="color:#92400e;margin-top:0;">🧰 Prerequisites &amp; Tools to Install</h2>
+  <p>Install everything in this table <strong>before</strong> class. Run the "Verify" command in your terminal — if it prints a version number, you're set; if it says <code>command not found</code>, the install didn't finish.</p>
+  <table style="width:100%;border-collapse:collapse;background:#ffffff;border-radius:8px;overflow:hidden;">
+    <caption style="text-align:left;font-weight:700;color:#78350f;padding-bottom:0.5rem;">Required tools, what they're for, and where to get them</caption>
+    <thead>
+      <tr style="background:#fde68a;">
+        <th scope="col" style="text-align:left;padding:0.6rem;color:#78350f;">Tool</th>
+        <th scope="col" style="text-align:left;padding:0.6rem;color:#78350f;">Why you need it</th>
+        <th scope="col" style="text-align:left;padding:0.6rem;color:#78350f;">Install / Docs</th>
+        <th scope="col" style="text-align:left;padding:0.6rem;color:#78350f;">Verify</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #fde68a;">
+        <th scope="row" style="text-align:left;padding:0.6rem;font-weight:600;">Node.js 18+</th>
+        <td style="padding:0.6rem;">Runs the Express API and the Vite build tooling; ships with npm.</td>
+        <td style="padding:0.6rem;"><a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer" style="color:#92400e;">nodejs.org/download</a></td>
+        <td style="padding:0.6rem;"><code>node --version</code></td>
+      </tr>
+      <tr style="border-bottom:1px solid #fde68a;">
+        <th scope="row" style="text-align:left;padding:0.6rem;font-weight:600;">Docker Desktop</th>
+        <td style="padding:0.6rem;">Runs the database container now, and every container you build in Part 2.</td>
+        <td style="padding:0.6rem;"><a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener noreferrer" style="color:#92400e;">docs.docker.com/get-docker</a></td>
+        <td style="padding:0.6rem;"><code>docker --version</code></td>
+      </tr>
+      <tr style="border-bottom:1px solid #fde68a;">
+        <th scope="row" style="text-align:left;padding:0.6rem;font-weight:600;">Docker Compose</th>
+        <td style="padding:0.6rem;">Included with Docker Desktop; orchestrates multiple containers from one file.</td>
+        <td style="padding:0.6rem;"><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer" style="color:#92400e;">docs.docker.com/compose</a></td>
+        <td style="padding:0.6rem;"><code>docker compose version</code></td>
+      </tr>
+      <tr style="border-bottom:1px solid #fde68a;">
+        <th scope="row" style="text-align:left;padding:0.6rem;font-weight:600;">Git</th>
+        <td style="padding:0.6rem;">Clones the starter repo and tracks the changes you'll submit.</td>
+        <td style="padding:0.6rem;"><a href="https://git-scm.com/downloads" target="_blank" rel="noopener noreferrer" style="color:#92400e;">git-scm.com/downloads</a></td>
+        <td style="padding:0.6rem;"><code>git --version</code></td>
+      </tr>
+      <tr>
+        <th scope="row" style="text-align:left;padding:0.6rem;font-weight:600;">Code editor</th>
+        <td style="padding:0.6rem;">Anything works; VS Code has good Docker/JS extensions.</td>
+        <td style="padding:0.6rem;"><a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" style="color:#92400e;">code.visualstudio.com</a></td>
+        <td style="padding:0.6rem;">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-bottom:0;"><strong>macOS users:</strong> the quickest path is Homebrew — <code>brew install node</code> and <code>brew install --cask docker</code>. Then open Docker Desktop once from Applications so its background daemon starts. Full Windows/Linux install notes are in the <a href="https://github.com/hvaandres/cyber-uvu-student-projects/blob/main/it-3200/containers/birthday_memory/README.md#prerequisites" target="_blank" rel="noopener noreferrer" style="color:#92400e;">README's Prerequisites section</a>.</p>
+</section>
+
+<section aria-labelledby="part1-heading" style="background:#eff6ff;border-left:6px solid #1d4ed8;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="part1-heading" style="color:#1e3a8a;margin-top:0;">🚀 Part 1 — Run the App Locally</h2>
+  <p>Follow these steps exactly once to confirm the app works <em>before</em> you touch Docker Compose.</p>
+  <h3 style="color:#1e40af;">1. Clone and install</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>git clone https://github.com/hvaandres/cyber-uvu-student-projects.git
+cd cyber-uvu-student-projects/it-3200/containers/birthday_memory
+npm run install:all</code></pre>
+  <h3 style="color:#1e40af;">2. Configure the database connection</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>cp server/.env.example server/.env</code></pre>
+  <p>The defaults already match the bundled Docker database, so leave the file as-is for now.</p>
+  <h3 style="color:#1e40af;">3. Start PostgreSQL with the existing Docker Compose file</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>npm run db:up
+docker compose ps   # confirm the "thebirthdates-db" service is healthy</code></pre>
+  <h3 style="color:#1e40af;">4. (Optional) Seed sample data</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>npm --prefix server run seed</code></pre>
+  <h3 style="color:#1e40af;">5. Start the app</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>npm run dev</code></pre>
+  <p style="margin-bottom:0;">Open <a href="http://localhost:5173" style="color:#1e3a8a;">http://localhost:5173</a> in your browser. Add a birthday, search for it, and check the calendar view before moving on. Press <kbd>Ctrl</kbd>+<kbd>C</kbd> to stop the app when you're done exploring.</p>
+</section>
+
+<section aria-labelledby="part2-heading" style="background:#fdf2f8;border-left:6px solid #be185d;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="part2-heading" style="color:#9d174d;margin-top:0;">🐳 Part 2 — Containerize the Whole App</h2>
+  <p><strong>This is the core of the assignment.</strong> Right now, <code>docker-compose.yml</code> only defines the <code>postgres</code> service. You will add two more services — <code>backend</code> and <code>frontend</code> — so that <code>docker compose up --build</code> launches all three containers together, networked so they can talk to each other.</p>
+
+  <h3 style="color:#9d174d;">Step A — Write a Dockerfile for the backend</h3>
+  <p>Create <code>server/Dockerfile</code>. It needs to:</p>
+  <ul style="padding-left:1.4rem;">
+    <li>Start from a Node 18+ base image (e.g. <code>node:18-alpine</code>).</li>
+    <li>Copy <code>package.json</code>/<code>package-lock.json</code> first and run <code>npm ci</code> (better layer caching than copying everything at once).</li>
+    <li>Copy the rest of the <code>server/</code> source.</li>
+    <li>Expose the API port (check <code>server/.env.example</code> for the port it listens on).</li>
+    <li>Run the app with its existing <code>start</code> script from <code>server/package.json</code>.</li>
+  </ul>
+
+  <h3 style="color:#9d174d;">Step B — Write a Dockerfile for the frontend</h3>
+  <p>Create <code>client/Dockerfile</code>. The simplest approach that satisfies this assignment: run Vite's own dev server inside the container (same command you already used in Part 1), bound to <code>0.0.0.0</code> so it's reachable from outside the container, and expose port <code>5173</code>.</p>
+  <details style="background:#ffffff;border:1px solid #fbcfe8;border-radius:8px;padding:0.6rem 1rem;margin:0.75rem 0;">
+    <summary style="cursor:pointer;font-weight:700;color:#9d174d;">Want an extra challenge? (optional, not required for full credit)</summary>
+    <p style="margin-bottom:0;">Instead of running the Vite dev server, use a multi-stage build: build the static site with <code>vite build</code> in one stage, then copy the output into an <code>nginx:alpine</code> stage to serve it. You'll need an nginx config that proxies <code>/api</code> requests to the <code>backend</code> service.</p>
+  </details>
+
+  <h3 style="color:#9d174d;">Step C — Add both services to <code>docker-compose.yml</code></h3>
+  <p>Keep the existing <code>postgres</code> service untouched, and add <code>backend</code> and <code>frontend</code> alongside it. Things to get right:</p>
+  <ul style="padding-left:1.4rem;">
+    <li>Each new service needs a <code>build: context</code> pointing at its folder (<code>./server</code> or <code>./client</code>) instead of an <code>image:</code> line.</li>
+    <li>Map container ports to host ports with <code>ports:</code> (e.g. backend <code>4000:4000</code>, frontend <code>5173:5173</code>).</li>
+    <li><strong>Inside the Docker network, services reach each other by service name, not <code>localhost</code>.</strong> Your backend's database host must be the Compose service name (e.g. <code>postgres</code>), and the port is the container-internal port <code>5432</code> — <em>not</em> the host-mapped <code>5544</code> from <code>server/.env</code>. Pass these as <code>environment:</code> values on the <code>backend</code> service rather than relying on the <code>.env</code> file, which is written for running on your host.</li>
+    <li>Use <code>depends_on</code> so the backend waits for <code>postgres</code>, and the frontend waits for the <code>backend</code>.</li>
+    <li>Give the frontend an environment variable pointing at the backend's URL (see <code>VITE_API_TARGET</code> in <code>client/vite.config.js</code>) — inside the network this should reference the <code>backend</code> service name, not <code>localhost</code>.</li>
+  </ul>
+
+  <h3 style="color:#9d174d;">Step D — Build and run everything</h3>
+  <pre style="background:#1e293b;color:#e2e8f0;padding:0.9rem 1rem;border-radius:8px;overflow-x:auto;"><code>npm run db:down          # stop anything from Part 1 first
+docker compose up --build</code></pre>
+  <p style="margin-bottom:0;">If it works, one command brought up the database, the API, and the web client — no local <code>npm run dev</code> required.</p>
+</section>
+
+<section aria-labelledby="part3-heading" style="background:#f0fdf4;border-left:6px solid #15803d;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="part3-heading" style="color:#166534;margin-top:0;">✅ Part 3 — Verify Everything Works</h2>
+  <p>Confirm each of these before you submit:</p>
+  <ul style="padding-left:1.4rem;margin-bottom:0;">
+    <li><code>docker compose ps</code> shows all three services as <code>running</code>/<code>healthy</code>.</li>
+    <li><code>docker compose logs backend</code> shows the API connected to Postgres with no errors.</li>
+    <li>The site loads in your browser at the frontend's mapped port and the calendar renders.</li>
+    <li>You can add a new birthday through the containerized app and see it appear in search and on the calendar.</li>
+    <li>Stopping and restarting with <code>docker compose down</code> then <code>docker compose up</code> (no <code>--build</code>) still works, and previously added birthdays are still there (the named volume persisted them).</li>
+  </ul>
+</section>
+
+<section aria-labelledby="troubleshooting-heading" style="background:#fef2f2;border-left:6px solid #b91c1c;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="troubleshooting-heading" style="color:#991b1b;margin-top:0;">🛠️ Troubleshooting</h2>
+  <p>Click a problem below to expand its fix.</p>
+
+  <details style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.6rem;">
+    <summary style="cursor:pointer;font-weight:700;color:#991b1b;">"failed to connect to the Docker daemon"</summary>
+    <p style="margin-bottom:0;">Docker Desktop isn't running. Open it from your Applications/Start menu and wait for the whale icon to show it's ready, then retry.</p>
+  </details>
+
+  <details style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.6rem;">
+    <summary style="cursor:pointer;font-weight:700;color:#991b1b;">Backend container can't reach Postgres (ECONNREFUSED)</summary>
+    <p style="margin-bottom:0;">Almost always a host/port mix-up. Inside <code>docker-compose.yml</code>, the backend must use the Postgres <strong>service name</strong> as the host (e.g. <code>postgres</code>) and port <code>5432</code> — not <code>localhost</code> and not <code>5544</code>. Those only work from your host machine, not from inside another container.</p>
+  </details>
+
+  <details style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 1rem;margin-bottom:0.6rem;">
+    <summary style="cursor:pointer;font-weight:700;color:#991b1b;">"Port is already in use" / EADDRINUSE</summary>
+    <p style="margin-bottom:0;">Something else is already bound to that port. Stop the Part 1 <code>npm run dev</code> process first (<code>Ctrl+C</code>), and run <code>npm run db:down</code> before starting the full Compose stack.</p>
+  </details>
+
+  <details style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 1rem;">
+    <summary style="cursor:pointer;font-weight:700;color:#991b1b;">Frontend loads but API calls fail</summary>
+    <p style="margin-bottom:0;">Check the frontend's environment variable for the API URL — inside the Docker network it should point at <code>http://backend:4000</code> (the service name), not <code>http://localhost:4000</code>, since <code>localhost</code> inside a container refers to that container itself.</p>
+  </details>
+</section>
+
+<section aria-labelledby="docs-heading" style="background:#ecfeff;border-left:6px solid #0e7490;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="docs-heading" style="color:#155e75;margin-top:0;">📚 Documentation &amp; Resources</h2>
+  <ul style="padding-left:1.4rem;margin-bottom:0;columns:2;-webkit-columns:2;column-gap:2rem;">
+    <li><a href="https://github.com/hvaandres/cyber-uvu-student-projects/tree/main/it-3200/containers/birthday_memory" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Birthday Memory project README</a></li>
+    <li><a href="https://docs.docker.com/reference/dockerfile/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Dockerfile reference</a></li>
+    <li><a href="https://docs.docker.com/compose/compose-file/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Compose file reference</a></li>
+    <li><a href="https://docs.docker.com/compose/networking/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Compose networking (service discovery)</a></li>
+    <li><a href="https://nodejs.org/docs/latest/api/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Node.js docs</a></li>
+    <li><a href="https://expressjs.com/en/4x/api.html" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Express 4 API docs</a></li>
+    <li><a href="https://node-postgres.com/" target="_blank" rel="noopener noreferrer" style="color:#155e75;"><code>pg</code> (node-postgres) docs</a></li>
+    <li><a href="https://vite.dev/guide/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">Vite guide</a></li>
+    <li><a href="https://react.dev/learn" target="_blank" rel="noopener noreferrer" style="color:#155e75;">React docs</a></li>
+    <li><a href="https://www.postgresql.org/docs/current/" target="_blank" rel="noopener noreferrer" style="color:#155e75;">PostgreSQL documentation</a></li>
+  </ul>
+</section>
+
+<section aria-labelledby="submit-heading" style="background:#fff7ed;border-left:6px solid #c2410c;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+  <h2 id="submit-heading" style="color:#9a3412;margin-top:0;">📤 What to Submit</h2>
+  <ol style="padding-left:1.4rem;">
+    <li>A link to <strong>your own GitHub repository</strong> (fork or copy of the project) with your <code>server/Dockerfile</code>, <code>client/Dockerfile</code>, and updated <code>docker-compose.yml</code> committed and pushed.</li>
+    <li>Screenshots showing:
+      <ul style="padding-left:1.4rem;">
+        <li>Output of <code>docker compose ps</code> with all three services running/healthy.</li>
+        <li>The app running in your browser (calendar view with at least one birthday added through the containerized app).</li>
+      </ul>
+    </li>
+    <li>A short written reflection (3–5 sentences) on the difference between the host-mapped Postgres port and the container-internal port, and why that mattered while you were containerizing the backend.</li>
+  </ol>
+  <p style="margin-bottom:0;"><strong>Submit</strong> your repository link, screenshots, and reflection through this Canvas assignment's file upload / text entry box.</p>
+</section>
+
+<footer style="background:#f8fafc;border:1px dashed #94a3b8;border-radius:10px;padding:1rem 1.5rem;color:#334155;">
+  <p style="margin:0;">Questions before the due date? Post them in the course discussion board or come to office hours — don't wait until the night before, since Docker networking issues are much easier to debug together.</p>
+</footer>
+
+</div>
