@@ -1,0 +1,58 @@
+# Auditbeat config for Docker Desktop on macOS.
+#
+# The `auditd` module is intentionally NOT enabled: Docker Desktop's linuxkit
+# kernel is built without CONFIG_AUDIT, so that module cannot start here.
+# Only modules that work on this kernel are configured below.
+
+auditbeat.modules:
+  # Watches the evidence directory for create/modify/delete/attribute changes.
+  # Must NOT point at path.data, or Auditbeat will audit its own registry file
+  # and generate an endless feedback loop of events.
+  - module: file_integrity
+    paths:
+      - /evidence
+    recursive: true
+    scan_at_start: true
+    hash_types: [sha256]
+
+  # `datasets` is the correct key for the Auditbeat system module.
+  # (`metricsets` is silently ignored and all defaults load instead.)
+  # `socket` is omitted: it needs kernel features linuxkit does not provide.
+  - module: system
+    datasets:
+      - host
+      - process
+      - user
+    period: 1m
+    state.period: 12h
+    # The auditbeat binary is ~151 MiB, which exceeds the 100 MiB default and
+    # makes the process dataset emit a `process_error` when hashing itself.
+    process.hash.max_file_size: 200 MiB
+    # Match the file_integrity module's algorithm (default here is sha1).
+    process.hash.hash_types: [sha256]
+
+# Ships events to the local single-node Elasticsearch stack defined in
+# docker-compose.elastic.yml. Start both compose files together (see that
+# file's header comment for the exact command) so Auditbeat can resolve the
+# "elasticsearch" and "kibana" service names. Auditbeat retries on its own
+# until Elasticsearch is reachable, so container start order does not matter.
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+
+# Single-node cluster: the default index templates request 1 replica, which
+# can never go healthy without a second node.
+setup.template.settings:
+  index.number_of_replicas: 0
+
+# Loads Auditbeat's pre-built "System" and "File Integrity" Kibana dashboards
+# on first run, so Kibana's Dashboards app has something to show immediately.
+setup.kibana:
+  host: "kibana:5601"
+setup.dashboards.enabled: true
+
+# To debug without the Elasticsearch/Kibana stack running, comment out the
+# output.elasticsearch block above and uncomment this instead:
+# output.console:
+#   pretty: true
+
+logging.level: info

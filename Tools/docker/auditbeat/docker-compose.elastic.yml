@@ -1,0 +1,81 @@
+# Optional Elasticsearch + Kibana stack so students can browse Auditbeat's
+# events and the pre-built dashboards in a browser instead of reading raw
+# console/JSON output.
+#
+# Start it together with the base compose file, from this directory, so all
+# three containers land in the same Docker Compose project and share the
+# "elastic" network (Auditbeat then resolves "elasticsearch"/"kibana" by
+# service name):
+#
+#   docker compose -f docker-compose.yml -f docker-compose.elastic.yml up -d
+#
+# Then open Kibana at http://localhost:5601 -> menu -> Dashboards, and
+# Elasticsearch's API directly at http://localhost:9200 if needed.
+#
+# Security is intentionally disabled (xpack.security.enabled=false). This is
+# a local, single-node teaching lab that is never exposed outside the
+# student's own machine — do not reuse this configuration for anything
+# production or internet-facing.
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.21
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      - "9200:9200"
+    volumes:
+      # Persists indices across container restarts. Ignored by git (see
+      # .gitignore), same treatment as auditbeat's own ./data directory.
+      - type: bind
+        source: ./esdata
+        target: /usr/share/elasticsearch/data
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.19.21
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5601/api/status | grep -q '\"level\":\"available\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Extends the auditbeat service from docker-compose.yml (only takes effect
+  # when both files are combined). setup.dashboards.enabled requires Kibana
+  # to be reachable the moment Auditbeat starts, or it exits immediately
+  # instead of retrying like it does for Elasticsearch — so it must wait for
+  # Kibana's healthcheck rather than just the container being up.
+  auditbeat:
+    depends_on:
+      kibana:
+        condition: service_healthy
+
+networks:
+  elastic:
