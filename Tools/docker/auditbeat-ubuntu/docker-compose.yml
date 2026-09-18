@@ -1,0 +1,93 @@
+# Auditbeat lab stack for a native Ubuntu host (Docker Engine on Linux).
+#
+# Unlike the Docker Desktop / macOS variant in ../auditbeat, the host kernel
+# here is a real Ubuntu kernel built with CONFIG_AUDIT, so the `auditd` module
+# can actually attach to the kernel audit subsystem. That requires extra
+# capabilities, host PID visibility, and a host that is not already running
+# its own auditd in unicast mode — see README.md before starting.
+services:
+  auditbeat:
+    image: docker.elastic.co/beats/auditbeat:8.19.21
+    read_only: true
+    command: ["auditbeat", "-e", "--strict.perms=false"]
+    # The kernel audit netlink socket is not namespaced. Auditbeat must run in
+    # the host PID namespace to correlate audit events with real host PIDs,
+    # otherwise every process event is attributed to the container's namespace.
+    pid: host
+    # Least-privilege alternative to `privileged: true`.
+    #   AUDIT_CONTROL   install/modify kernel audit rules (audit_rules below)
+    #   AUDIT_READ      receive events from the audit netlink socket
+    #   NET_ADMIN       open the AUDIT netlink family
+    #   SYS_PTRACE      read /proc/<pid>/* of host processes (system.process)
+    #   DAC_READ_SEARCH bypass DAC checks when hashing host binaries
+    cap_add:
+      - AUDIT_CONTROL
+      - AUDIT_READ
+      - NET_ADMIN
+      - SYS_PTRACE
+      - DAC_READ_SEARCH
+    # Ubuntu ships an AppArmor profile (docker-default) that denies the audit
+    # netlink operations above. Unconfining only this container is narrower
+    # than disabling AppArmor host-wide.
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - type: bind
+        source: ./auditbeat.yml
+        target: /usr/share/auditbeat/auditbeat.yml
+        read_only: true
+      # Auditbeat's own registry (beat.db). Never monitor this path.
+      - type: bind
+        source: ./data
+        target: /usr/share/auditbeat/data
+      # Directory students drop evidence files into; watched by file_integrity.
+      - type: bind
+        source: ./evidence
+        target: /evidence
+      # Host procfs, so the `system` module reports host processes/users
+      # instead of the single process inside this container. Paired with
+      # `system.hostfs: /hostfs` in auditbeat.yml.
+      - type: bind
+        source: /proc
+        target: /hostfs/proc
+        read_only: true
+      # Lets Auditbeat resolve host UIDs/GIDs to real account names.
+      - type: bind
+        source: /etc/passwd
+        target: /hostfs/etc/passwd
+        read_only: true
+      - type: bind
+        source: /etc/group
+        target: /hostfs/etc/group
+        read_only: true
+      # `system.login` dataset: reads the host's wtmp/btmp login records.
+      # Mounted at the same path the dataset looks for by default.
+      - type: bind
+        source: /var/log
+        target: /var/log
+        read_only: true
+      # `system.package` dataset: dpkg's installed-package database.
+      - type: bind
+        source: /var/lib/dpkg
+        target: /var/lib/dpkg
+        read_only: true
+      # Required only by the optional `socket` dataset (kprobes are installed
+      # by writing to tracefs, so this one must stay writable). Harmless to
+      # leave mounted while that dataset is commented out.
+      - type: bind
+        source: /sys/kernel/debug
+        target: /sys/kernel/debug
+    # Shared with docker-compose.elastic.yml so Auditbeat can reach
+    # Elasticsearch/Kibana by service name. Defined here too (not only in
+    # the elastic file) so this compose file still works standalone.
+    networks:
+      - elastic
+    # Beat logging is verbose; cap it so it cannot fill the disk.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  elastic:

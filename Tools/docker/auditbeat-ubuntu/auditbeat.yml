@@ -1,0 +1,126 @@
+# Auditbeat config for Docker Engine on a native Ubuntu host.
+#
+# The difference that matters versus the macOS variant (../auditbeat): the
+# Ubuntu kernel is built with CONFIG_AUDIT, so the `auditd` module works and
+# is enabled below. Everything else mirrors the macOS config so students see
+# the same file_integrity/system events on either platform.
+
+auditbeat.modules:
+  # Kernel audit subsystem. Only ONE process may hold the unicast audit
+  # netlink socket, so the host's own auditd must be stopped (see README)
+  # before this starts, otherwise Auditbeat logs
+  # "failed to set audit PID" / "dial: address already in use".
+  - module: auditd
+    # Turn numeric uid/gid/syscall values into names in the event.
+    resolve_ids: true
+    # Do not let the kernel kill or panic the host if the audit backlog
+    # overflows; a teaching lab should degrade quietly.
+    failure_mode: silent
+    backlog_limit: 8192
+    rate_limit: 0
+    include_raw_message: false
+    include_warnings: false
+    # Keep raw audit volume down: Auditbeat pauses reading rather than
+    # letting the kernel drop records when the output is slow.
+    backpressure_strategy: auto
+    # These rules are installed into the kernel at start and removed on stop.
+    # `-k` keys show up as `auditd.data.key` and are the easiest thing to
+    # filter on in Kibana's Discover view.
+    audit_rules: |
+      # --- Evidence directory: who touched the artifacts, and how ---
+      -w /evidence -p warx -k evidence_access
+
+      # --- Execution ---
+      -a always,exit -F arch=b64 -S execve,execveat -k exec
+      -a always,exit -F arch=b32 -S execve,execveat -k exec
+
+      # --- Privilege escalation / identity changes ---
+      -a always,exit -F arch=b64 -S setuid,setgid,setreuid,setregid -F auid>=1000 -F auid!=unset -k priv_change
+      -w /etc/sudoers -p wa -k sudoers
+      -w /etc/sudoers.d/ -p wa -k sudoers
+
+      # --- Account and authentication databases ---
+      -w /etc/passwd -p wa -k identity
+      -w /etc/group -p wa -k identity
+      -w /etc/shadow -p wa -k identity
+      -w /etc/gshadow -p wa -k identity
+
+      # --- Anti-forensics: log tampering ---
+      -w /var/log/auth.log -p wa -k log_tamper
+      -w /var/log/wtmp -p wa -k log_tamper
+      -w /var/log/btmp -p wa -k log_tamper
+
+      # --- Kernel module loading (rootkit indicator) ---
+      -a always,exit -F arch=b64 -S init_module,finit_module,delete_module -k modules
+
+  # Watches the evidence directory for create/modify/delete/attribute changes.
+  # Must NOT point at path.data, or Auditbeat will audit its own registry file
+  # and generate an endless feedback loop of events.
+  #
+  # Complements the `-w /evidence` audit rule above: file_integrity reports
+  # WHAT changed (hash, size, mode), auditd reports WHO changed it (uid, pid,
+  # the executable that made the syscall).
+  - module: file_integrity
+    paths:
+      - /evidence
+    recursive: true
+    scan_at_start: true
+    hash_types: [sha256]
+    # On Linux, `auto` picks ebpf/kprobes when available and falls back to
+    # fsnotify. Force `fsnotify` if the kernel refuses to load the probe.
+    backend: auto
+
+  # `datasets` is the correct key for the Auditbeat system module.
+  # (`metricsets` is silently ignored and all defaults load instead.)
+  - module: system
+    datasets:
+      - host
+      - process
+      - user
+      # Ubuntu-only datasets the macOS/linuxkit variant cannot run:
+      - login    # reads wtmp/btmp — requires the /var/log mount, see below
+      - package  # dpkg inventory — requires the /var/lib/dpkg mount, see below
+      # `socket` needs kprobes on tracefs. It works on Ubuntu but is noisy and
+      # can fail on hardened/locked-down kernels, so it is opt-in: uncomment
+      # this line only after confirming /sys/kernel/debug/tracing is writable
+      # inside the container.
+      # - socket
+    period: 1m
+    state.period: 12h
+    # The auditbeat binary is ~151 MiB, which exceeds the 100 MiB default and
+    # makes the process dataset emit a `process_error` when hashing itself.
+    process.hash.max_file_size: 200 MiB
+    # Match the file_integrity module's algorithm (default here is sha1).
+    process.hash.hash_types: [sha256]
+
+# Read host state through the bind mounts declared in docker-compose.yml
+# (/proc, /etc/passwd, /etc/group) instead of the container's own namespace.
+# Without this, the `host`/`process`/`user` datasets describe the container.
+system.hostfs: /hostfs
+
+# Ships events to the local single-node Elasticsearch stack defined in
+# docker-compose.elastic.yml. Start both compose files together (see that
+# file's header comment for the exact command) so Auditbeat can resolve the
+# "elasticsearch" and "kibana" service names. Auditbeat retries on its own
+# until Elasticsearch is reachable, so container start order does not matter.
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+
+# Single-node cluster: the default index templates request 1 replica, which
+# can never go healthy without a second node.
+setup.template.settings:
+  index.number_of_replicas: 0
+
+# Loads Auditbeat's pre-built "System", "File Integrity" and "Auditd" Kibana
+# dashboards on first run, so Kibana's Dashboards app has something to show
+# immediately.
+setup.kibana:
+  host: "kibana:5601"
+setup.dashboards.enabled: true
+
+# To debug without the Elasticsearch/Kibana stack running, comment out the
+# output.elasticsearch block above and uncomment this instead:
+# output.console:
+#   pretty: true
+
+logging.level: info
