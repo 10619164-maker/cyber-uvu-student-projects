@@ -59,6 +59,18 @@ export async function initSchema() {
         (EXTRACT(DAY FROM birthdate))
       )
   `);
+
+  // Domain 1 (API) hardening: backing table for authenticated team accounts.
+  // NOTE: PGUSER/PGPASSWORD fallback defaults above are a separate, tracked finding
+  // (Domain 2 - Database) and are addressed in that domain's remediation pass, not here.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      username      text UNIQUE NOT NULL,
+      password_hash text NOT NULL,
+      created_at    timestamptz NOT NULL DEFAULT now()
+    )
+  `);
 }
 
 export function mapRow(row) {

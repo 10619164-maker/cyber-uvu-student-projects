@@ -11,11 +11,22 @@ const SELECT_COLUMNS = `
   id, first_name, last_name, birthdate, phone, email, created_at, updated_at
 `;
 
+// Domain 1 (API) hardening: GET / and GET /upcoming previously fetched the entire
+// table with no bound at all - the "unbounded query" DoS condition flagged in the
+// threat model. The client's own design intentionally loads the whole roster once
+// and does search/calendar grouping client-side for instant UX at this app's real
+// scale (an internal team's birthdays); a full pagination rework isn't proportional
+// to that design, so instead a hard server-side ceiling replaces "unbounded" with
+// "bounded but generous." If this tool ever needs to scale past a few thousand
+// people, the client's load-everything model would need to become server-side
+// paginated - documented as a residual/roadmap item, not solved in this pass.
+const HARD_ROW_CAP = 2000;
+
 /** Wraps an async handler so rejected promises reach the error middleware. */
 const wrap = (handler) => (req, res, next) =>
   Promise.resolve(handler(req, res, next)).catch(next);
 
-/** GET /api/birthdays?q=&month= — list, optionally filtered. */
+/** GET /api/birthdays?q=&month= — list, optionally filtered, capped at HARD_ROW_CAP rows. */
 router.get(
   '/',
   wrap(async (req, res) => {
@@ -44,13 +55,17 @@ router.get(
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
+    params.push(HARD_ROW_CAP);
+    const capPlaceholder = `$${params.length}`;
+
     const { rows } = await pool.query(
       `SELECT ${SELECT_COLUMNS}
          FROM birthdays
          ${where}
         ORDER BY EXTRACT(MONTH FROM birthdate),
                  EXTRACT(DAY FROM birthdate),
-                 lower(first_name)`,
+                 lower(first_name)
+        LIMIT ${capPlaceholder}`,
       params,
     );
 
@@ -58,14 +73,17 @@ router.get(
   }),
 );
 
-/** GET /api/birthdays/upcoming?days=30 — soonest celebrations first. */
+/** GET /api/birthdays/upcoming?days=30 — soonest celebrations first, capped fetch. */
 router.get(
   '/upcoming',
   wrap(async (req, res) => {
     const days = Number(req.query.days);
     const window = Number.isFinite(days) && days > 0 ? Math.min(days, 366) : 30;
 
-    const { rows } = await pool.query(`SELECT ${SELECT_COLUMNS} FROM birthdays`);
+    const { rows } = await pool.query(
+      `SELECT ${SELECT_COLUMNS} FROM birthdays LIMIT $1`,
+      [HARD_ROW_CAP],
+    );
 
     const upcoming = rows
       .map((row) => decorate(mapRow(row)))

@@ -15,6 +15,7 @@ async function request(path, options = {}) {
   try {
     response = await fetch(`${BASE}${path}`, {
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // send the httpOnly session cookie
       ...options,
     });
   } catch {
@@ -54,4 +55,11 @@ export const api = {
   update: (id, payload) =>
     request(`/api/birthdays/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   remove: (id) => request(`/api/birthdays/${id}`, { method: 'DELETE' }),
+};
+
+export const auth = {
+  me: () => request('/api/auth/me'),
+  login: (username, password) =>
+    request('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
+  logout: () => request('/api/auth/logout', { method: 'POST' }),
 };

@@ -1,0 +1,539 @@
+﻿Domain 1 API - AFTER evidence - captured 2026-09-22T12:10:00.3478105-06:00
+
+===== 1. Unauthenticated GET /api/birthdays (no credentials supplied) - expect 401, no PII returned =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:32 char:1
++ curl.exe -i http://localhost:4000/api/birthdays 2>&1 | Tee-Object -Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     36 100     36   0      0  17964      0                              0
+100     36 100     36   0      0  17013      0                              0
+100     36 100     36   0      0  16223      0                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 294
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 2. CORS check - does the API reflect an arbitrary, untrusted origin? (expect no Access-Control-Allow-Origin for evil-example.test) =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:35 char:1
++ curl.exe -i -H "Origin: http://evil-example.test" http://localhost:40 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     36 100     36   0      0  12345      0                              0
+100     36 100     36   0      0  11896      0                              0
+100     36 100     36   0      0  11542      0                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 293
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 3. Response headers check on /api/health - expect helmet security headers now present =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:38 char:1
++ curl.exe -i http://localhost:4000/api/health 2>&1 | Tee-Object -FileP ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     42 100     42   0      0   3399      0                              0
+100     42 100     42   0      0   3359      0                              0
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 292
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 42
+ETag: W/"2a-d+ZUZLg0sBAxNX+SUhxZdOlYVhY"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+100     42 100     42   0      0   3335      0                              0
+{"status":"ok","database":"thebirthdates"}
+
+===== 4. SQL injection probe #1 (tautology, ?q=) against the now-protected endpoint - expect 401 before query logic even runs =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:41 char:1
++ curl.exe -i "http://localhost:4000/api/birthdays?q=%27%20OR%20%271%27 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     36 100     36   0      0  10909      0                              0
+100     36 100     36   0      0  10541      0                              0
+100     36 100     36   0      0  10192      0                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 291
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 5. SQL injection probe #2 (stacked DROP TABLE attempt, ?q=) - expect 401, same reasoning =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:44 char:1
++ curl.exe -i "http://localhost:4000/api/birthdays?q=x%27%3B%20DROP%20T ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     36 100     36   0      0  19365      0                              0
+100     36 100     36   0      0  18200      0                              0
+100     36 100     36   0      0  17175      0                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 290
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 6. Unauthenticated POST /api/birthdays - expect 401, no probe record created =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:50 char:1
++ curl.exe -i -X POST http://localhost:4000/api/birthdays -H "Content-T ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100    130 100     36 100     94  14223  37139                              0
+100    130 100     36 100     94  13714  35809                              0
+100    130 100     36 100     94  13043  34057                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 289
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 7. Unauthenticated PUT /api/birthdays/<arbitrary-id> - expect 401 before any lookup/update happens =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:57 char:1
++ curl.exe -i -X PUT "http://localhost:4000/api/birthdays/00000000-0000 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100    149 100     36 100    113   8277  25982                              0
+100    149 100     36 100    113   7735  24280                              0
+100    149 100     36 100    113   7544  23679                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 288
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 8. Unauthenticated DELETE /api/birthdays/<arbitrary-id> - expect 401 =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:61 char:1
++ curl.exe -i -X DELETE "http://localhost:4000/api/birthdays/00000000-0 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     36 100     36   0      0  18489      0                              0
+100     36 100     36   0      0  17475      0                              0
+100     36 100     36   0      0  16697      0                              0
+HTTP/1.1 401 Unauthorized
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 287
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 36
+ETag: W/"24-2ya6UNOy8AlxJkjNOyYmjYabP90"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":"Authentication required."}
+
+===== 9. Login with valid seeded credentials - capture Set-Cookie (httpOnly session token, cookie itself not usable via JS) =====
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:67 char:1
++ curl.exe -i -c $cookieJar -X POST http://localhost:4000/api/auth/logi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100     78 100     24 100     54    475   1069                              0
+100     78 100     24 100     54    473   1065                              0
+100     78 100     24 100     54    472   1063                              0
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 10;w=900
+RateLimit-Limit: 10
+RateLimit-Remaining: 8
+RateLimit-Reset: 683
+Set-Cookie: birthday_memory_token=<redacted-session-jwt-not-committed>; Max-Age=3600; Path=/; Expires=Tue, 22 Sep 2026 19:10:00 GMT; HttpOnly; SameSite=Strict
+Content-Type: application/json; charset=utf-8
+Content-Length: 24
+ETag: W/"18-EZiKJQB9fha2EpfanFiWkCXhris"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"username":"team.lead"}
+
+===== 10. Authenticated GET /api/birthdays using the session cookie from step 9 - expect 200 and all 8 seeded records =====
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 285
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 2504
+ETag: W/"9c8-p+S8hCXK76F4x7gTek2RrRdQRFo"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[{"id":"e700df4f-4e0d-45a7-a23a-493d9cbc6c74","firstName":"Margaret","lastName":"Hamilton","birthdate":"1984-02-29","phone":"+1 415 555 0106","email":"margaret@example.com","createdAt":"2026-09-22T17:29:43.852Z","updatedAt":"2026-09-22T17:29:43.852Z","age":42,"turningAge":43,"daysUntil":159,"nextBirthday":"2027-02-28"},{"id":"c6f3e0a3-346b-4a14-9e12-9cab1788d719","firstName":"Tim","lastName":"Berners-Lee","birthdate":"1999-06-08","phone":"+1 415 555 0108","email":"tim@example.com","createdAt":"2026-09-22T17:29:43.854Z","updatedAt":"2026-09-22T17:29:43.854Z","age":27,"turningAge":28,"daysUntil":259,"nextBirthday":"2027-06-08"},{"id":"f34fa450-d890-4277-b992-43b5889f7651","firstName":"Linus","lastName":"Torvalds","birthdate":"1991-08-17","phone":"+1 415 555 0105","email":"linus@example.com","createdAt":"2026-09-22T17:29:43.851Z","updatedAt":"2026-09-22T17:29:43.851Z","age":35,"turningAge":36,"daysUntil":329,"nextBirthday":"2027-08-17"},{"id":"08b279aa-5387-4074-8e92-4935530d57f9","firstName":"Ada","lastName":"Lovelace","birthdate":"1990-09-22","phone":"+1 415 555 0101","email":"ada@example.com","createdAt":"2026-09-22T17:29:43.846Z","updatedAt":"2026-09-22T17:29:43.846Z","age":36,"turningAge":36,"daysUntil":0,"nextBirthday":"2026-09-22"},{"id":"2eaa43f9-f821-47cf-b68a-f547d5c1c338","firstName":"Grace","lastName":"Hopper","birthdate":"1986-09-25","phone":"+1 415 555 0102","email":"grace@example.com","createdAt":"2026-09-22T17:29:43.848Z","updatedAt":"2026-09-22T17:29:43.848Z","age":39,"turningAge":40,"daysUntil":3,"nextBirthday":"2026-09-25"},{"id":"852c1c50-ef34-4b38-9adc-907360f01f71","firstName":"Alan","lastName":"Turing","birthdate":"1978-10-04","phone":"+1 415 555 0103","email":"alan@example.com","createdAt":"2026-09-22T17:29:43.849Z","updatedAt":"2026-09-22T17:29:43.849Z","age":47,"turningAge":48,"daysUntil":12,"nextBirthday":"2026-10-04"},{"id":"45ee2cdb-193d-42ef-a1a4-afe36e43320a","firstName":"Katherine","lastName":"Johnson","birthdate":"1995-10-18","phone":"+1 415 555 0104","email":"katherine@example.com","createdAt":"2026-09-22T17:29:43.850Z","updatedAt":"2026-09-22T17:29:43.850Z","age":30,"turningAge":31,"daysUntil":26,"nextBirthday":"2026-10-18"},{"id":"ca2cc981-2898-4da6-a1d3-a862d0d44f62","firstName":"Hedy","lastName":"Lamarr","birthdate":"1974-11-09","phone":"+1 415 555 0107","email":"hedy@example.com","createdAt":"2026-09-22T17:29:43.853Z","updatedAt":"2026-09-22T17:29:43.853Z","age":51,"turningAge":52,"daysUntil":48,"nextBirthday":"2026-11-09"}]
+
+===== 11. Authenticated round trip - create, edit, delete a probe record while logged in (proves the fix did not break legitimate use) =====
+HTTP/1.1 201 Created
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 284
+RateLimit-Reset: 669
+Content-Type: application/json; charset=utf-8
+Content-Length: 305
+ETag: W/"131-2ZB+EKhAZ691UZRaM2LbMeZz7Bk"
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":"d2aae893-634a-4a5a-868d-ebdcec1b6333","firstName":"Probe","lastName":"Authenticated","birthdate":"2001-02-02","phone":null,"email":"probe@example.com","createdAt":"2026-09-22T18:10:00.853Z","updatedAt":"2026-09-22T18:10:00.853Z","age":25,"turningAge":26,"daysUntil":133,"nextBirthday":"2027-02-02"}
+
+[test script] Captured probe record id for cleanup: d2aae893-634a-4a5a-868d-ebdcec1b6333
+curl.exe :   % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+At C:\Users\febua\source\repos\cyber-uvu-student-projects\cybr-4550\threat_actors\birthday_memory\docs\assessment\testi
+ng\domain1-api-after-tests.ps1:85 char:1
++ curl.exe -i -b $cookieJar -X DELETE "http://localhost:4000/api/birthd ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ... Time   Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+  0      0   0      0   0      0      0      0                              0
+  0      0   0      0   0      0      0      0                              0
+  0      0   0      0   0      0      0      0                              0
+HTTP/1.1 204 No Content
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:5173
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=900
+RateLimit-Limit: 300
+RateLimit-Remaining: 283
+RateLimit-Reset: 669
+Date: Tue, 22 Sep 2026 18:10:00 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+===== 12. Final authenticated record count (should be back to 8 - the probe record was created and deleted by step 11) =====
+[{"id":"e700df4f-4e0d-45a7-a23a-493d9cbc6c74","firstName":"Margaret","lastName":"Hamilton","birthdate":"1984-02-29","phone":"+1 415 555 0106","email":"margaret@example.com","createdAt":"2026-09-22T17:29:43.852Z","updatedAt":"2026-09-22T17:29:43.852Z","age":42,"turningAge":43,"daysUntil":159,"nextBirthday":"2027-02-28"},{"id":"c6f3e0a3-346b-4a14-9e12-9cab1788d719","firstName":"Tim","lastName":"Berners-Lee","birthdate":"1999-06-08","phone":"+1 415 555 0108","email":"tim@example.com","createdAt":"2026-09-22T17:29:43.854Z","updatedAt":"2026-09-22T17:29:43.854Z","age":27,"turningAge":28,"daysUntil":259,"nextBirthday":"2027-06-08"},{"id":"f34fa450-d890-4277-b992-43b5889f7651","firstName":"Linus","lastName":"Torvalds","birthdate":"1991-08-17","phone":"+1 415 555 0105","email":"linus@example.com","createdAt":"2026-09-22T17:29:43.851Z","updatedAt":"2026-09-22T17:29:43.851Z","age":35,"turningAge":36,"daysUntil":329,"nextBirthday":"2027-08-17"},{"id":"08b279aa-5387-4074-8e92-4935530d57f9","firstName":"Ada","lastName":"Lovelace","birthdate":"1990-09-22","phone":"+1 415 555 0101","email":"ada@example.com","createdAt":"2026-09-22T17:29:43.846Z","updatedAt":"2026-09-22T17:29:43.846Z","age":36,"turningAge":36,"daysUntil":0,"nextBirthday":"2026-09-22"},{"id":"2eaa43f9-f821-47cf-b68a-f547d5c1c338","firstName":"Grace","lastName":"Hopper","birthdate":"1986-09-25","phone":"+1 415 555 0102","email":"grace@example.com","createdAt":"2026-09-22T17:29:43.848Z","updatedAt":"2026-09-22T17:29:43.848Z","age":39,"turningAge":40,"daysUntil":3,"nextBirthday":"2026-09-25"},{"id":"852c1c50-ef34-4b38-9adc-907360f01f71","firstName":"Alan","lastName":"Turing","birthdate":"1978-10-04","phone":"+1 415 555 0103","email":"alan@example.com","createdAt":"2026-09-22T17:29:43.849Z","updatedAt":"2026-09-22T17:29:43.849Z","age":47,"turningAge":48,"daysUntil":12,"nextBirthday":"2026-10-04"},{"id":"45ee2cdb-193d-42ef-a1a4-afe36e43320a","firstName":"Katherine","lastName":"Johnson","birthdate":"1995-10-18","phone":"+1 415 555 0104","email":"katherine@example.com","createdAt":"2026-09-22T17:29:43.850Z","updatedAt":"2026-09-22T17:29:43.850Z","age":30,"turningAge":31,"daysUntil":26,"nextBirthday":"2026-10-18"},{"id":"ca2cc981-2898-4da6-a1d3-a862d0d44f62","firstName":"Hedy","lastName":"Lamarr","birthdate":"1974-11-09","phone":"+1 415 555 0107","email":"hedy@example.com","createdAt":"2026-09-22T17:29:43.853Z","updatedAt":"2026-09-22T17:29:43.853Z","age":51,"turningAge":52,"daysUntil":48,"nextBirthday":"2026-11-09"}]
+
+===== 13. Login rate limiting - repeated wrong-password attempts against /api/auth/login, expect a 429 once the limit is hit =====
+
+--- attempt 1 ---
+attempt 1 -> HTTP 401
+
+--- attempt 2 ---
+attempt 2 -> HTTP 401
+
+--- attempt 3 ---
+attempt 3 -> HTTP 401
+
+--- attempt 4 ---
+attempt 4 -> HTTP 401
+
+--- attempt 5 ---
+attempt 5 -> HTTP 401
+
+--- attempt 6 ---
+attempt 6 -> HTTP 401
+
+--- attempt 7 ---
+attempt 7 -> HTTP 401
+
+--- attempt 8 ---
+attempt 8 -> HTTP 401
+
+--- attempt 9 ---
+attempt 9 -> HTTP 429
+
+--- attempt 10 ---
+attempt 10 -> HTTP 429
+
+--- attempt 11 ---
+attempt 11 -> HTTP 429
+
+--- attempt 12 ---
+attempt 12 -> HTTP 429

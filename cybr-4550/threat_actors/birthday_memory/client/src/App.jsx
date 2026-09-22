@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import AddSection from './components/AddSection.jsx';
 import SearchSection from './components/SearchSection.jsx';
 import CalendarSection from './components/CalendarSection.jsx';
+import LoginScreen from './components/LoginScreen.jsx';
 import { Toast, useToast } from './components/Toast.jsx';
 import { useBirthdays } from './hooks/useBirthdays.js';
+import { useAuth } from './hooks/useAuth.js';
 import { fullName } from './lib/utils.js';
 
 const NAV = [
@@ -13,6 +15,30 @@ const NAV = [
 ];
 
 export default function App() {
+  const { isAuthenticated, checking, username, login, logout } = useAuth();
+
+  // Domain 1 fix: gate the entire app behind a real session instead of showing
+  // every teammate's PII to any visitor. Nothing below this point renders (and no
+  // /api/birthdays request is ever made) until a valid session is confirmed.
+  if (checking) {
+    return (
+      <div className="app">
+        <div className="loader" style={{ paddingTop: '20vh' }}>
+          <span className="loader__ring" aria-hidden="true" />
+          <p>Checking your session…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginScreen onLogin={login} />;
+  }
+
+  return <AuthenticatedApp username={username} onLogout={logout} />;
+}
+
+function AuthenticatedApp({ username, onLogout }) {
   const { birthdays, loading, error, refresh, create, update, remove } = useBirthdays();
   const { toast, show, dismiss } = useToast();
   const [active, setActive] = useState('add');
@@ -83,6 +109,12 @@ export default function App() {
             </a>
           ))}
         </nav>
+        <div className="topbar__account">
+          <span className="topbar__username">{username}</span>
+          <button type="button" className="btn btn--ghost btn--small" onClick={onLogout}>
+            Sign out
+          </button>
+        </div>
       </header>
 
       <main className="container">
