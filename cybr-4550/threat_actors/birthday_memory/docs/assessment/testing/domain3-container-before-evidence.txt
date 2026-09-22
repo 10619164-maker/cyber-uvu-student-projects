@@ -1,0 +1,6 @@
+Domain 3 Container - "before" port-exposure evidence - captured 2026-09-22T20:34:58.159Z
+
+===== Attempting connection to 10.0.0.171:5544 (a LAN-facing IP of this machine, NOT localhost) =====
+Connection SUCCEEDED - the database port is reachable from this machine's LAN-facing address.
+Row count in "birthdays": 8
+Result: any other device on the same network segment as this one could reach this port and, with valid credentials, read every record - not just processes on this machine.

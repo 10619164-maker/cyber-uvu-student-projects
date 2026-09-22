@@ -1,0 +1,5 @@
+Domain 3 Container - "after" port-exposure evidence - captured 2026-09-22T20:37:17.784Z
+
+===== Attempting connection to 10.0.0.171:5544 (a LAN-facing IP of this machine, NOT localhost) =====
+Connection FAILED: connect ECONNREFUSED 10.0.0.171:5544
+Result: the database port is NOT reachable from this LAN-facing address - only loopback/this-machine traffic can reach it.

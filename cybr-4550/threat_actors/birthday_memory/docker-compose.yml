@@ -1,6 +1,12 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    # Domain 3 fix: pinned to the exact digest that was running during this assessment
+    # (captured via `docker inspect thebirthdates-db --format "{{.Image}}"`), instead of
+    # the floating tag `postgres:16-alpine`, which Docker Hub could silently repoint to
+    # different image content later (a supply-chain integrity concern - "16-alpine" is a
+    # name someone else controls, not a fixed artifact). The tag is kept alongside the
+    # digest for human readability; the digest is what's actually pulled and run.
+    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
     container_name: thebirthdates-db
     restart: unless-stopped
     environment:
@@ -16,7 +22,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set - copy .env.example to .env in this folder}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set - copy .env.example to .env in this folder}
     ports:
-      - "5544:5432"
+      # Domain 3 fix: bound to 127.0.0.1 only. The old "5544:5432" form (no bind address)
+      # defaults to 0.0.0.0 - listening on every network interface on this machine, not
+      # just loopback. Proven directly (connected from this machine's own LAN-facing IP
+      # address, no VPN or second device needed) in
+      # docs/assessment/testing/domain3-container-before-evidence.txt: anyone else on the
+      # same network could reach this port. Binding to 127.0.0.1 restricts it to processes
+      # on this machine only, matching how it's actually meant to be used (by the API,
+      # running on the same host).
+      - "127.0.0.1:5544:5432"
     volumes:
       - thebirthdates-data:/var/lib/postgresql/data
     healthcheck:
@@ -24,6 +38,21 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    # Domain 3 fix: resource limits, so this one container can't exhaust the host's CPU
+    # or memory (a defense-in-depth measure related to the DoS/resource-exhaustion row in
+    # the threat model's Boundary 1). 512MB / 1 CPU is generous headroom for this small
+    # single-developer dev database and its ~8-row synthetic dataset.
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+    # Domain 3 fix: prevents any process in the container from gaining additional
+    # privileges (e.g. via a setuid binary), even if something inside the container were
+    # compromised. Cheap, safe, universally-recommended hardening with no functional
+    # downside for this workload.
+    security_opt:
+      - no-new-privileges:true
 
 volumes:
   thebirthdates-data:

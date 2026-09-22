@@ -9,3 +9,9 @@ Connection SUCCEEDED.
 Row count in "birthdays": 8
 Sample row (synthetic seed data): {"first_name":"Ada","last_name":"Lovelace","email":"ada@example.com","phone":"+1 415 555 0101"}
 Result: full read access to the PII table achieved using only these credentials, with zero interaction with the Express API or its auth layer.
+
+===== Attempting direct connection to localhost:5544 as user "birthday_app" (no TLS requested) =====
+Connection SUCCEEDED.
+Row count in "birthdays": 8
+Sample row (synthetic seed data): {"first_name":"Ada","last_name":"Lovelace","email":"ada@example.com","phone":"+1 415 555 0101"}
+Result: full read access to the PII table achieved using only these credentials, with zero interaction with the Express API or its auth layer.
