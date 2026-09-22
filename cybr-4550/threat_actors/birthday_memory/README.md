@@ -1,3 +1,58 @@
+> **Portfolio note:** This repository started as a deliberately vulnerable teaching app
+> for CYBR 4550 ("Operation Candlelight") and became the subject of a hands-on
+> application security assessment I conducted end to end — threat modeling, live
+> penetration-style testing, remediation, and verification. The section below summarizes
+> that work; the rest of this README is the original project documentation (features,
+> setup, stack).
+
+# Security Assessment — Operation Candlelight
+
+**Role:** Application security engineer (remediation track). **Scope:** a self-hosted
+fork, run entirely on my own machine against synthetic data — see
+[`SECURITY.md`](SECURITY.md) for the full rules of engagement.
+
+## What I did
+
+1. **Threat modeled the app** from its actual source code (not assumption) — a data flow
+   diagram, STRIDE analysis across three trust boundaries, and an asset inventory, then
+   used that to prioritize a remediation roadmap.
+   → [`docs/assessment/THREAT_MODEL.md`](docs/assessment/THREAT_MODEL.md)
+2. **Tested before touching any code.** Every finding was proven live — direct API
+   requests, direct database connections bypassing the app entirely — not assumed from a
+   code read. One "obvious" suspected vulnerability (SQL injection via the search
+   filter) was tested and confirmed **not** exploitable; reported as such rather than
+   assumed.
+3. **Remediated three domains**, each with its own before/after evidence:
+   - **API** — added authentication (every record endpoint was previously open to
+     anyone), restricted CORS, added security headers and rate limiting.
+   - **Database** — removed hardcoded default credentials (proven directly exploitable —
+     bypassed the API and its auth entirely), fixed a TLS certificate-validation flaw.
+   - **Container** — closed a network exposure (the database was reachable from the
+     whole local network, not just this machine), pinned the image to a fixed digest,
+     added resource limits.
+4. **Verified the fixes** with live "after" evidence for every finding, a 21-test
+   automated regression suite (Vitest + Supertest), and a dependency vulnerability scan.
+   → [`docs/assessment/B3-VERIFICATION.md`](docs/assessment/B3-VERIFICATION.md)
+5. **Documented the investigation as it happened**, including dead ends and
+   troubleshooting — a Windows-specific bug that silently prevented the server from
+   starting (with zero error output) took real debugging to track down and fix; that
+   story is in the Domain 2 commit and [`docs/assessment/DOMAIN2-DATABASE.md`](docs/assessment/DOMAIN2-DATABASE.md).
+
+## Skills demonstrated
+
+STRIDE threat modeling · live vulnerability testing (not assumption-based) · secure
+authentication design (argon2id, httpOnly/SameSite session cookies) · Docker/Postgres
+hardening · automated regression testing · honest scoping and residual-risk
+documentation (knowing what *not* to fix in a given pass, and writing down why).
+
+## Full evidence trail
+
+`docs/assessment/` — threat model, per-domain remediation notes, and raw before/after
+test transcripts for every finding. [`SECURITY.md`](SECURITY.md) has the condensed
+summary and current residual risk statement.
+
+---
+
 # 🎂 Birthday Memory
 
 **Never miss a birthday again.** A modern, colorful web app to save, search, and celebrate the birthdays of everyone you care about. Add first name, last name, birthdate, phone and email once, and the app keeps them organized, searchable, and visible on a beautiful month-by-month calendar.
