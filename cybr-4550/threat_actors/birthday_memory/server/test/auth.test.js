@@ -11,7 +11,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
-import { app } from '../src/index.js';
+import { app } from '../src/app.js';
 import { initSchema, pool } from '../src/db.js';
 import { hashPassword } from '../src/auth.js';
 

@@ -4,15 +4,23 @@ services:
     container_name: thebirthdates-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: thebirthdates
-      POSTGRES_USER: birthday
-      POSTGRES_PASSWORD: birthday
+      # Domain 2 fix: these used to be hardcoded literally in this file as
+      # POSTGRES_USER: birthday / POSTGRES_PASSWORD: birthday - a guessable, publicly
+      # visible credential pair, proven directly exploitable (bypassing the API and its
+      # auth entirely) in docs/assessment/testing/domain2-db-before-evidence.txt.
+      # Now sourced from a root .env file (gitignored) that docker compose reads
+      # automatically. Copy .env.example to .env and set real values before running this.
+      # The ":?..." syntax makes `docker compose up` fail with a clear message instead of
+      # silently starting with an empty/guessable value if .env is missing or incomplete.
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set - copy .env.example to .env in this folder}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set - copy .env.example to .env in this folder}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set - copy .env.example to .env in this folder}
     ports:
       - "5544:5432"
     volumes:
       - thebirthdates-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U birthday -d thebirthdates"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
